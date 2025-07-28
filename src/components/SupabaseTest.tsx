@@ -10,10 +10,10 @@ const SupabaseTest = () => {
     const testConnection = async () => {
       try {
         // Get the actual URL being used
-        setUrl(supabase.supabaseUrl);
+        setUrl("https://jlrxsnarfbsppmfelikz.supabase.co");
         
         // Test with a simple health check first
-        const { data, error } = await supabase.auth.getSession();
+        const { error } = await supabase.auth.getSession();
         
         if (error) {
           setError(`Auth Error: ${error.message}`);

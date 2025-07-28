@@ -1,48 +1,43 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 const SupabaseTest = () => {
-  const [connectionStatus, setConnectionStatus] = useState<string>("Testing...");
-  const [error, setError] = useState<string | null>(null);
-  const [url, setUrl] = useState<string>("");
+  const [status, setStatus] = useState<string>("Loading...");
+  const [config, setConfig] = useState<any>({});
 
   useEffect(() => {
-    const testConnection = async () => {
-      try {
-        // Get the actual URL being used
-        setUrl("https://jlrxsnarfbsppmfelikz.supabase.co");
-        
-        // Test with a simple health check first
-        const { error } = await supabase.auth.getSession();
-        
-        if (error) {
-          setError(`Auth Error: ${error.message}`);
-          setConnectionStatus("Failed - Auth");
-        } else {
-          setConnectionStatus("Connected successfully!");
-          setError(null);
-        }
-      } catch (err) {
-        setError(`Connection error: ${err}`);
-        setConnectionStatus("Failed - Network");
-      }
-    };
-
-    testConnection();
+    try {
+      // Check environment variables
+      const envConfig = {
+        VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+        VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        mode: import.meta.env.MODE,
+        dev: import.meta.env.DEV
+      };
+      
+      setConfig(envConfig);
+      
+      // Try to import supabase client
+      import("@/integrations/supabase/client").then((module) => {
+        setStatus("Supabase client loaded successfully");
+      }).catch((error) => {
+        setStatus(`Failed to load Supabase client: ${error.message}`);
+      });
+      
+    } catch (error) {
+      setStatus(`Configuration error: ${error}`);
+    }
   }, []);
 
   return (
     <div className="p-4 border rounded-lg bg-gray-50">
-      <h3 className="text-lg font-semibold mb-2">Supabase Connection Test</h3>
-      <p className="mb-2">Status: <span className={connectionStatus === "Connected successfully!" ? "text-green-600" : "text-red-600"}>{connectionStatus}</span></p>
-      {error && (
-        <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded">
-          <p className="text-red-700 text-sm">{error}</p>
-        </div>
-      )}
+      <h3 className="text-lg font-semibold mb-2">Supabase Configuration Test</h3>
+      <p className="mb-2">Status: <span className={status.includes("successfully") ? "text-green-600" : "text-red-600"}>{status}</span></p>
+      
       <div className="mt-2 text-xs text-gray-600">
-        <p>Configured URL: {url}</p>
-        <p>Expected: https://jlrxsnarfbsppmfelikz.supabase.co</p>
+        <h4 className="font-semibold">Environment Variables:</h4>
+        <pre className="bg-gray-100 p-2 rounded mt-1 overflow-auto">
+          {JSON.stringify(config, null, 2)}
+        </pre>
       </div>
     </div>
   );

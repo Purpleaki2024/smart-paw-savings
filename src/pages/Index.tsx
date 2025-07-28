@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import Dashboard from "@/components/Dashboard";
 import ExpenseTracking from "@/components/ExpenseTracking";
 import InsuranceComparison from "@/components/InsuranceComparison";
+import SupabaseTest from "@/components/SupabaseTest";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -33,6 +34,9 @@ const Index = () => {
       <div className="flex">
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
         <main className="flex-1 p-6 max-w-7xl mx-auto">
+          <div className="mb-4">
+            <SupabaseTest />
+          </div>
           {renderContent()}
         </main>
       </div>
